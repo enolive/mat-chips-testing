@@ -1,31 +1,43 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component'
+import {render, screen, within} from '@testing-library/angular'
+import {MatInputModule} from '@angular/material/input'
+import {MatIconModule} from '@angular/material/icon'
+import {MatChipsModule} from '@angular/material/chips'
+import userEvent from '@testing-library/user-event'
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
-  });
+  it('renders heading', async () => {
+    await renderComponent()
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+    expect(screen.getByRole('heading')).toHaveTextContent('Test for Chips Input')
+  })
 
-  it(`should have as title 'mat-chips-testing'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('mat-chips-testing');
-  });
+  it('displays the favorite fruits', async () => {
+    await renderComponent()
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('mat-chips-testing app is running!');
-  });
-});
+    const chips = screen.getByRole('listbox')
+    const fruits = within(chips).getAllByRole('option')
+    expect(fruits).toHaveLength(3)
+    expect(fruits[0]).toHaveTextContent('Lemon')
+    expect(fruits[1]).toHaveTextContent('Lime')
+    expect(fruits[2]).toHaveTextContent('Apple')
+  })
+
+  it('supports adding new chips', async () => {
+    await renderComponent()
+    const chipsInput = screen.getByLabelText('Favorite Fruits')
+
+    userEvent.type(chipsInput, 'Banana{Enter}')
+
+    const fruits = screen.getAllByRole('option')
+    expect(fruits).toHaveLength(4)
+  })
+})
+
+const renderComponent = () => render(AppComponent, {
+  imports: [
+    MatInputModule,
+    MatIconModule,
+    MatChipsModule,
+  ]
+})
