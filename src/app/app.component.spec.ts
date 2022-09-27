@@ -27,7 +27,7 @@ describe('AppComponent', () => {
     await renderComponent()
     const chipsInput = screen.getByLabelText('Favorite Fruits')
 
-    userEvent.type(chipsInput, 'Banana{Enter}')
+    await userEvent.type(chipsInput, 'Banana{Enter}')
 
     const fruits = screen.getAllByRole('option')
     expect(fruits).toHaveLength(4)
